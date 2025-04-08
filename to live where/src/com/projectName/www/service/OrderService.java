@@ -36,7 +36,7 @@ public class OrderService {
         order.setCustomerId(customerId);
         order.setMerchantId(merchantId);
         order.setRoomTypeId(roomTypeId);
-        order.setStatus("pending");
+        order.setStatus("待入住");
         order.setPrice(price);
         order.setCreateTime(new Date());
         order.setCheckInTime(checkInTime);

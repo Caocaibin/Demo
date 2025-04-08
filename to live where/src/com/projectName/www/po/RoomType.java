@@ -6,6 +6,7 @@ import java.util.Date;
  * 房型实体类，包含房型的基本信息
  */
 public class RoomType {
+    private int id;
     private String roomTypeId;
     private String merchantId;
     private String bedType;
@@ -105,4 +106,12 @@ public class RoomType {
         this.description = description;
         this.createTime = createTime;
     }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }

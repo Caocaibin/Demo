@@ -5,12 +5,13 @@ import com.projectName.www.service.MerchantService;
 import com.projectName.www.service.OrderService;
 import com.projectName.www.service.RoomTypeService;
 import com.projectName.www.service.RechargeService;
+import com.projectName.www.service.ManagerService; // 新增 ManagerService 导入
 import com.projectName.www.po.User;
 import com.projectName.www.po.Merchant;
 import com.projectName.www.po.Order;
 import com.projectName.www.po.RoomType;
 import com.projectName.www.po.Recharge;
-import com.projectName.www.constant.RoleConstants;
+import com.projectName.www.po.Manager; // 假设存在 Manager 类
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ public class MainServlet {
     private OrderService orderService = new OrderService();
     private RoomTypeService roomTypeService = new RoomTypeService();
     private RechargeService rechargeService = new RechargeService();
+    private ManagerService managerService = new ManagerService();
     private Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -39,6 +41,7 @@ public class MainServlet {
         System.out.println("====《住哪儿》===");
         System.out.println("1.登录");
         System.out.println("2.注册");
+        System.out.println("3.退出");
         System.out.println("请输入数字来选择您的操作");
         int choose = scanner.nextInt();
         scanner.nextLine(); // 消耗换行符
@@ -48,6 +51,10 @@ public class MainServlet {
                 break;
             case 2:
                 register();
+                break;
+                case 3:
+                System.out.println("感谢您的使用，再见！");
+                System.exit(0);
                 break;
             default:
                 System.out.println("操作有误，您输入的数字有误或不是数字");
@@ -63,6 +70,7 @@ public class MainServlet {
         System.out.println("1.用户");
         System.out.println("2.商户");
         System.out.println("3.管理员");
+        System.out.println("4.退出");
         int role = scanner.nextInt();
         scanner.nextLine(); // 消耗换行符
         System.out.println("请输入您的账号");
@@ -89,64 +97,21 @@ public class MainServlet {
                 }
                 break;
             case 3:
-                // 管理员登录逻辑
+                Manager manager = managerService.login(username, password);
+                if (manager != null) {
+                    showManagerMenu(manager); // 调用 showManagerMenu 方法
+                } else {
+                    System.out.println("用户名或密码错误，请重新输入");
+                    login();
+                }
+                break;
+                case 4:
+                System.out.println("感谢您的使用，再见！");
+                System.exit(0);
                 break;
             default:
                 System.out.println("操作有误，您输入的数字有误或不是数字");
                 login();
-        }
-    }
-
-    /**
-     * 用户注册
-     */
-    public void register() {
-        System.out.println("1.用户注册");
-        System.out.println("2.商户注册");
-        int role = scanner.nextInt();
-        scanner.nextLine(); // 消耗换行符
-        switch (role) {
-            case 1:
-                System.out.println("请输入用户名");
-                String username = scanner.nextLine();
-                System.out.println("请输入密码");
-                String password = scanner.nextLine();
-                System.out.println("请输入真实姓名");
-                String realName = scanner.nextLine();
-                System.out.println("请输入手机号码");
-                String phone = scanner.nextLine();
-                if (userService.register(username, password, realName, phone)) {
-                    System.out.println("注册成功，请登录");
-                    login();
-                } else {
-                    System.out.println("注册失败，请重试");
-                    register();
-                }
-                break;
-            case 2:
-                System.out.println("请输入商户名称");
-                String merchantName = scanner.nextLine();
-                System.out.println("请输入商户地址");
-                String merchantAddress = scanner.nextLine();
-                System.out.println("请输入商户联系电话");
-                String merchantPhoneNumber = scanner.nextLine();
-                System.out.println("请输入关键词");
-                String keywords = scanner.nextLine();
-                System.out.println("请输入商户状态");
-                String merchantState = scanner.nextLine();
-                System.out.println("请输入商户申请状态");
-                String merchantApplyState = scanner.nextLine();
-                if (merchantService.register(merchantName, merchantAddress, merchantPhoneNumber, keywords, merchantState, merchantApplyState)) {
-                    System.out.println("注册成功，请登录");
-                    login();
-                } else {
-                    System.out.println("注册失败，请重试");
-                    register();
-                }
-                break;
-            default:
-                System.out.println("操作有误，您输入的数字有误或不是数字");
-                register();
         }
     }
 
@@ -241,13 +206,12 @@ public class MainServlet {
                     Date checkInTime = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(checkInTimeStr);
                     Date checkOutTime = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(checkOutTimeStr);
                     RoomType selectedRoomType = roomTypes.stream()
-                            .filter(rt -> rt.getRoomTypeId().equals(roomTypeId))
-                            .findFirst()
-                            .orElse(null);
+                           .filter(rt -> rt.getRoomTypeId().equals(roomTypeId))
+                           .findFirst()
+                           .orElse(null);
                     if (selectedRoomType != null && selectedRoomType.getStock() > 0) {
                         if (orderService.createOrder(String.valueOf(user.getId()), merchantId, roomTypeId, selectedRoomType.getPrice(), checkInTime, checkOutTime)) {
                             System.out.println("订房成功");
-                            // 更新库存
                             selectedRoomType.setStock(selectedRoomType.getStock() - 1);
                             roomTypeService.updateRoomType(roomTypeId, selectedRoomType.getBedType(), selectedRoomType.getPrice(), selectedRoomType.getKeywords(), selectedRoomType.getStock(), selectedRoomType.getDescription());
                         } else {
@@ -286,6 +250,7 @@ public class MainServlet {
      * @param merchant 商户对象
      */
     public void showMerchantMenu(Merchant merchant) {
+        java.util.Scanner scanner = new java.util.Scanner(System.in);
         System.out.println("欢迎，" + merchant.getMerchantName());
         System.out.println("1.查看店铺信息");
         System.out.println("2.修改店铺信息");
@@ -297,6 +262,7 @@ public class MainServlet {
         System.out.println("8.退出");
         int choose = scanner.nextInt();
         scanner.nextLine(); // 消耗换行符
+        MerchantService merchantService = new MerchantService();
         switch (choose) {
             case 1:
                 System.out.println("商户名称：" + merchant.getMerchantName());
@@ -323,7 +289,7 @@ public class MainServlet {
                 String merchantApplyState = scanner.nextLine();
                 if (merchantService.updateMerchantInfo(merchant.getId(), merchantName, merchantAddress, merchantPhoneNumber, keywords, merchantState, merchantApplyState)) {
                     System.out.println("修改成功");
-                    merchant = merchantService.findMerchantById(merchant.getId());
+                    merchant = merchantService.login(merchant.getUsername(), merchant.getPassword());
                 } else {
                     System.out.println("修改失败，请重试");
                 }
@@ -350,7 +316,7 @@ public class MainServlet {
                         scanner.nextLine(); // 消耗换行符
                         System.out.println("请输入描述");
                         String description = scanner.nextLine();
-                        if (roomTypeService.addRoomType(String.valueOf(merchant.getId()), bedType, price, roomKeywords, stock, description)) {
+                        if (merchantService.addRoomType(merchant.getId(), bedType, price, roomKeywords, stock, description)) {
                             System.out.println("添加成功");
                         } else {
                             System.out.println("添加失败，请重试");
@@ -359,7 +325,8 @@ public class MainServlet {
                         break;
                     case 2:
                         System.out.println("请输入房型 ID");
-                        String roomTypeId = scanner.nextLine();
+                        int roomTypeId = 0;
+                        roomTypeId = scanner.nextInt();
                         System.out.println("请输入新的床型");
                         String newBedType = scanner.nextLine();
                         System.out.println("请输入新的价格");
@@ -372,7 +339,7 @@ public class MainServlet {
                         scanner.nextLine(); // 消耗换行符
                         System.out.println("请输入新的描述");
                         String newDescription = scanner.nextLine();
-                        if (roomTypeService.updateRoomType(roomTypeId, newBedType, newPrice, newKeywords, newStock, newDescription)) {
+                        if (merchantService.updateRoomType(roomTypeId, newBedType, newPrice, newKeywords, newStock, newDescription)) {
                             System.out.println("修改成功");
                         } else {
                             System.out.println("修改失败，请重试");
@@ -380,9 +347,10 @@ public class MainServlet {
                         showMerchantMenu(merchant);
                         break;
                     case 3:
+
                         System.out.println("请输入房型 ID");
-                        String deleteRoomTypeId = scanner.nextLine();
-                        if (roomTypeService.deleteRoomType(deleteRoomTypeId)) {
+                        roomTypeId = scanner.nextInt();
+                        if (merchantService.deleteRoomType(roomTypeId)) {
                             System.out.println("删除成功");
                         } else {
                             System.out.println("删除失败，请重试");
@@ -390,9 +358,9 @@ public class MainServlet {
                         showMerchantMenu(merchant);
                         break;
                     case 4:
-                        List<RoomType> roomTypes = roomTypeService.getRoomTypesByMerchantId(String.valueOf(merchant.getId()));
-                        for (RoomType roomType : roomTypes) {
-                            System.out.println("房型 ID：" + roomType.getRoomTypeId());
+                        java.util.List<com.projectName.www.po.RoomType> roomTypes = merchantService.getRoomTypesByMerchantId(merchant.getId());
+                        for (com.projectName.www.po.RoomType roomType : roomTypes) {
+                            System.out.println("房型 ID：" + roomType.getId());
                             System.out.println("床型：" + roomType.getBedType());
                             System.out.println("剩余数量：" + roomType.getStock());
                             System.out.println("关键词：" + roomType.getKeywords());
@@ -420,11 +388,13 @@ public class MainServlet {
                 scanner.nextLine(); // 消耗换行符
                 System.out.println("请输入新的订单状态");
                 String status = scanner.nextLine();
-                if (orderService.updateOrderStatus(orderId, status)) {
-                    System.out.println("修改成功");
-                } else {
-                    System.out.println("修改失败，请重试");
-                }
+                // 假设存在 OrderService 类处理订单状态修改
+                // OrderService orderService = new OrderService();
+                // if (orderService.updateOrderStatus(orderId, status)) {
+                //     System.out.println("修改成功");
+                // } else {
+                //     System.out.println("修改失败，请重试");
+                // }
                 showMerchantMenu(merchant);
                 break;
             case 7:
@@ -437,6 +407,148 @@ public class MainServlet {
             default:
                 System.out.println("操作有误，您输入的数字有误或不是数字");
                 showMerchantMenu(merchant);
+        }
+    }
+
+    /**
+     * 显示管理员菜单
+     * @param manager 管理员对象
+     */
+    public void showManagerMenu(Manager manager) {
+        System.out.println("欢迎，管理员");
+        System.out.println("1.查看所有商家信息");
+        System.out.println("2.审核商户入驻申请");
+        System.out.println("3.封禁店铺");
+        System.out.println("4.审核租户充值");
+        System.out.println("5.退出");
+        int choose = scanner.nextInt();
+        scanner.nextLine(); // 消耗换行符
+        switch (choose) {
+            case 1:
+                List<Merchant> merchants = merchantService.getAllMerchants();
+                for (Merchant merchant : merchants) {
+                    System.out.println("商户 ID：" + merchant.getId());
+                    System.out.println("商户名称：" + merchant.getMerchantName());
+                    System.out.println("商户地址：" + merchant.getMerchantAddress());
+                    System.out.println("商户联系电话：" + merchant.getMerchantPhoneNumber());
+                    System.out.println("关键词：" + merchant.getKeywords());
+                    System.out.println("商户状态：" + merchant.getMerchantState());
+                    System.out.println("商户申请状态：" + merchant.getMerchantApplyState());
+                    System.out.println("营业额：" + merchant.getMerchantSales());
+                    System.out.println("-------------------");
+                }
+                showManagerMenu(manager);
+                break;
+            case 2:
+                System.out.println("请输入商户 ID");
+                int merchantId = scanner.nextInt();
+                scanner.nextLine(); // 消耗换行符
+                System.out.println("是否通过审核（true/false）");
+                boolean approved = scanner.nextBoolean();
+                scanner.nextLine(); // 消耗换行符
+                if (managerService.approveMerchant(merchantId)) {
+                    System.out.println("审核成功");
+                } else {
+                    System.out.println("审核失败，请重试");
+                }
+                showManagerMenu(manager);
+                break;
+            case 3:
+                System.out.println("请输入商户 ID");
+                int banMerchantId = scanner.nextInt();
+                scanner.nextLine(); // 消耗换行符
+                if (managerService.approveMerchant(banMerchantId)) {
+                    System.out.println("封禁成功");
+                } else {
+                    System.out.println("封禁失败，请重试");
+                }
+                showManagerMenu(manager);
+                break;
+            case 4:
+                System.out.println("请输入充值记录 ID");
+                int rechargeId = scanner.nextInt();
+                scanner.nextLine(); // 消耗换行符
+                System.out.println("是否通过审核（true/false）");
+                boolean rechargeApproved = scanner.nextBoolean();
+                scanner.nextLine(); // 消耗换行符
+                if (managerService.approveRecharge(rechargeId)) {
+                    System.out.println("审核成功");
+                    if (rechargeApproved) {
+                        Recharge recharge = rechargeService.getRechargeById(rechargeId);
+                        User user = userService.findUserById(Integer.parseInt(recharge.getCustomerId()));
+                        user.setBalance(user.getBalance() + recharge.getAmount());
+                        userService.updateUserInfo(user.getId(), user.getRealName(), user.getPhone());
+                    }
+                } else {
+                    System.out.println("审核失败，请重试");
+                }
+                showManagerMenu(manager);
+                break;
+            case 5:
+                showMainMenu();
+                break;
+            default:
+                System.out.println("操作有误，您输入的数字有误或不是数字");
+                showManagerMenu(manager);
+        }
+    }
+
+    /**
+     * 用户注册
+     */
+    public void register() {
+        System.out.println("1.用户注册");
+        System.out.println("2.商户注册");
+        int role = scanner.nextInt();
+        scanner.nextLine(); // 消耗换行符
+        switch (role) {
+            case 1:
+                System.out.println("请输入用户名");
+                String username = scanner.nextLine();
+                System.out.println("请输入密码");
+                String password = scanner.nextLine();
+                System.out.println("请输入真实姓名");
+                String realName = scanner.nextLine();
+                System.out.println("请输入手机号码");
+                String phone = scanner.nextLine();
+                if (userService.register(username, password, realName, phone)) {
+                    System.out.println("注册成功，请登录");
+                    login();
+                } else {
+                    System.out.println("注册失败，请重试");
+                    register();
+                }
+                break;
+            case 2:
+                System.out.println("请输入用户名");
+                String merchantUsername = scanner.nextLine();
+                System.out.println("请输入密码");
+                String merchantPassword = scanner.nextLine();
+                System.out.println("请输入商户名称");
+                String merchantName = scanner.nextLine();
+                System.out.println("请输入商户地址");
+                String merchantAddress = scanner.nextLine();
+                System.out.println("请输入商户联系电话");
+                String merchantPhoneNumber = scanner.nextLine();
+                System.out.println("请输入关键词");
+                String keywords = scanner.nextLine();
+                System.out.println("请输入商户状态");
+                String merchantState = scanner.nextLine();
+                String merchantApplyState = "未通过";
+                double merchantSales = 0.0;
+                Date createTime = new Date();
+                MerchantService merchantService = new MerchantService();
+                if (merchantService.register(merchantUsername, merchantPassword, merchantName, merchantAddress, merchantPhoneNumber, keywords, merchantState, merchantApplyState,merchantSales, createTime)) {
+                    System.out.println("注册成功，请登录");
+                    login();
+                } else {
+                    System.out.println("注册失败，请重试");
+                    register();
+                }
+                break;
+            default:
+                System.out.println("操作有误，您输入的数字有误或不是数字");
+                register();
         }
     }
 }

@@ -7,6 +7,8 @@ import java.util.Date;
  */
 public class Merchant {
     private int id;
+    private String username;
+    private String password;
     private String merchantName;
     private String merchantAddress;
     private String merchantPhoneNumber;
@@ -23,6 +25,22 @@ public class Merchant {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getMerchantName() {
@@ -94,8 +112,10 @@ public class Merchant {
     }
 
     // 有参构造函数
-    public Merchant(int id, String merchantName, String merchantAddress, String merchantPhoneNumber, String keywords, String merchantState, String merchantApplyState, Double merchantSales, Date createTime) {
+    public Merchant(int id, String username, String password, String merchantName, String merchantAddress, String merchantPhoneNumber, String keywords, String merchantState, String merchantApplyState, Double merchantSales, Date createTime) {
         this.id = id;
+        this.username = username;
+        this.password = password;
         this.merchantName = merchantName;
         this.merchantAddress = merchantAddress;
         this.merchantPhoneNumber = merchantPhoneNumber;

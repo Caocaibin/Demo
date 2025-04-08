@@ -10,6 +10,9 @@ CREATE TABLE user (
                       role INT NOT NULL,
                       createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 删除列
+ALTER TABLE user
+    DROP COLUMN role;
 
 -- 商户表
 CREATE TABLE merchant (
@@ -23,6 +26,12 @@ CREATE TABLE merchant (
                           merchantSales DOUBLE DEFAULT 0,
                           createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- 商户表添加列
+ALTER TABLE merchant ADD username VARCHAR(50) NOT NULL FIRST;
+ALTER TABLE merchant ADD password VARCHAR(50) NOT NULL AFTER username;
+-- 商户表修改列
+ALTER TABLE merchant
+    MODIFY COLUMN id VARCHAR(50) FIRST;
 
 -- 房型表
 CREATE TABLE room_type (

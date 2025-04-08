@@ -12,7 +12,6 @@ public class User {
     private String realName;
     private String phone;
     private double balance;
-    private int role;
     private Date createTime;
 
     // Getters 和 Setters 方法
@@ -64,14 +63,6 @@ public class User {
         this.balance = balance;
     }
 
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -85,14 +76,13 @@ public class User {
     }
 
     // 有参构造函数
-    public User(int id, String username, String password, String realName, String phone, double balance, int role, Date createTime) {
+    public User(int id, String username, String password, String realName, String phone, double balance, Date createTime) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.realName = realName;
         this.phone = phone;
         this.balance = balance;
-        this.role = role;
         this.createTime = createTime;
     }
 }

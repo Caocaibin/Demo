@@ -2,7 +2,6 @@ package com.projectName.www.dao;
 
 import com.projectName.www.po.RoomType;
 import com.projectName.www.util.JDBCUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,9 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 房型数据访问对象，负责与数据库中的房型表进行交互
- */
 public class RoomTypeDao {
     /**
      * 根据商户 ID 查询房型
@@ -41,7 +37,7 @@ public class RoomTypeDao {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("根据商户 ID 查询房型时发生 SQL 异常，商户 ID: " + merchantId + ", 异常信息: " + e.getMessage());
         }
         return roomTypes;
     }
@@ -66,7 +62,7 @@ public class RoomTypeDao {
             pstmt.setTimestamp(9, new java.sql.Timestamp(roomType.getCreateTime().getTime()));
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("添加房型时发生 SQL 异常，房型 ID: " + roomType.getRoomTypeId() + ", 异常信息: " + e.getMessage());
         }
         return false;
     }
@@ -89,7 +85,7 @@ public class RoomTypeDao {
             pstmt.setString(7, roomType.getRoomTypeId());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("修改房型信息时发生 SQL 异常，房型 ID: " + roomType.getRoomTypeId() + ", 异常信息: " + e.getMessage());
         }
         return false;
     }
@@ -106,7 +102,7 @@ public class RoomTypeDao {
             pstmt.setString(1, roomTypeId);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("删除房型时发生 SQL 异常，房型 ID: " + roomTypeId + ", 异常信息: " + e.getMessage());
         }
         return false;
     }

@@ -2,7 +2,6 @@ package com.projectName.www.dao;
 
 import com.projectName.www.po.Order;
 import com.projectName.www.util.JDBCUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,10 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 订单数据访问对象，负责与数据库中的订单表进行交互
- * @author YourName
- */
 public class OrderDao {
     /**
      * 根据用户 ID 查询订单
@@ -42,7 +37,6 @@ public class OrderDao {
                 }
             }
         } catch (SQLException e) {
-            // 记录日志而不是简单打印堆栈信息，方便后续排查问题
             System.err.println("查询订单时发生 SQL 异常: " + e.getMessage());
         }
         return orders;
